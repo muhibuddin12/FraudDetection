@@ -1,158 +1,167 @@
 # Fraud Detection API
 
-### Overview
+## 📚 Project Overview
 
-This project is a **Fraud Detection API** that uses machine learning to predict fraudulent transactions. The API is built using **FastAPI**, with a **Random Forest** model trained on transaction data to identify potential fraud. This system aims to assist in preventing fraudulent activities by accurately flagging suspicious transactions in real-time.
+This project aims to build a **Fraud Detection API** that uses machine learning to predict fraudulent transactions based on input data. The API is built using **FastAPI**, and the machine learning model is a **Random Forest Classifier** trained with transaction data. The goal is to provide a reliable way to identify potential fraud cases and assist in fraud prevention efforts.
 
----
+Additionally, a **Streamlit** interface is provided for easy interaction with the model through a web-based UI.
 
-## Features
+### 🌟 Features
+- **FastAPI**-based API for fraud detection.
+- **Random Forest** machine learning model for fraud prediction.
+- **Streamlit** interface for user-friendly interaction.
+- Easy-to-use and scalable solution for identifying fraudulent transactions.
 
-- **FastAPI-based RESTful API** for fraud detection
-- Machine learning model (**Random Forest**) to predict fraud
-- Supports real-time predictions with high accuracy
-- Rate limiting to prevent abuse of API
-- JSON-based API for easy integration with other services
+## 🛠️ Installation
 
----
+Follow these steps to install the project and set it up in your local environment.
 
-## Project Purpose
+### 1. **Clone the repository**
 
-The goal of this project is to provide a scalable API that can predict whether a financial transaction is fraudulent based on transaction attributes such as the amount, balances, and other features. It can be integrated into any payment or banking system to minimize fraud and ensure secure transactions.
+First, clone this repository to your local machine:
 
-### Key objectives:
-- Implement a machine learning-based fraud detection system.
-- Provide an easy-to-use API for real-time predictions.
-- Minimize false positives and false negatives for better user experience.
-
----
-
-## Installation
-
-Follow these steps to install and set up the project on your local machine:
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/muhibuddin12/FraudDetection.git
-   cd FraudDetection
-   ```
-
-2. **Create a virtual environment**:
-   ```bash
-   python -m venv venv
-   ```
-
-3. **Activate the virtual environment**:
-
-   - On macOS/Linux:
-     ```bash
-     source venv/bin/activate
-     ```
-
-   - On Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
-
-4. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-5. **Set up environment variables**:
-   Create a `.env` file in the root directory of the project, and add any required environment variables. For example:
-   ```plaintext
-   DATABASE_URL=your_database_url
-   ```
-
----
-
-## Running the API
-
-Once all dependencies are installed, and the environment is set up, follow these steps to run the API:
-
-1. **Run the FastAPI server**:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-
-   This will start the server locally, and it can be accessed at `http://127.0.0.1:8000`.
-
-2. **Access the Swagger Documentation**:
-
-   FastAPI automatically generates interactive API documentation that can be accessed at:
-   - Swagger UI: `http://127.0.0.1:8000/docs`
-   - ReDoc: `http://127.0.0.1:8000/redoc`
-
-3. **Test the API**:
-   Use the `/predict_fraud` endpoint to test fraud detection. You can send a POST request with the following example payload:
-   ```json
-   {
-     "amount": 5000.0,
-     "oldbalanceOrg": 20000.0,
-     "newbalanceOrig": 15000.0,
-     "oldbalanceDest": 1000.0,
-     "newbalanceDest": 6000.0
-   }
-   ```
-
----
-
-## Example Request and Response
-
-### Request:
 ```bash
-POST /predict_fraud
-Content-Type: application/json
+git clone https://github.com/username/FraudDetection.git
+```
 
+Navigate to the project directory:
+
+```bash
+cd FraudDetection
+```
+
+### 2. **Set up Virtual Environment**
+
+Create and activate a virtual environment (optional but recommended):
+
+- **Linux/macOS**:
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+- **Windows**:
+
+    ```bash
+    python -m venv venv
+    venv\Scripts\activate
+    ```
+
+### 3. **Install Required Dependencies**
+
+Install the required Python packages from the `requirements.txt` file:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. **Set up Environment Variables**
+
+Create a `.env` file in the root directory to store any environment-specific configurations. For example:
+
+```
+API_KEY=your-api-key-here
+MODEL_PATH=models/random_forest_model.pkl
+```
+
+Make sure to customize the file according to your project's needs.
+
+## 🚀 Running the Application
+
+### 1. **Running the FastAPI Server**
+
+To run the FastAPI server, use **Uvicorn**. It will serve the Fraud Detection API:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+By default, the API will be available at:
+
+```
+http://127.0.0.1:8000
+```
+
+You can visit the automatically generated API documentation provided by FastAPI at:
+
+- **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+### 2. **Example API Request**
+
+You can test the API by sending a POST request to the `/predict_fraud` endpoint with transaction data:
+
+```json
 {
-  "amount": 5000.0,
-  "oldbalanceOrg": 20000.0,
-  "newbalanceOrig": 15000.0,
-  "oldbalanceDest": 1000.0,
-  "newbalanceDest": 6000.0
+  "amount": 1000.0,
+  "oldbalanceOrg": 5000.0,
+  "newbalanceOrig": 4000.0,
+  "oldbalanceDest": 10000.0,
+  "newbalanceDest": 11000.0
 }
 ```
 
-### Response:
+You will receive a response similar to this:
+
 ```json
 {
   "is_fraud": false,
-  "probability": 0.05
+  "probability": 0.85
 }
 ```
 
----
+## 🌐 Running the Streamlit App
 
-## Contributing
+To make interaction with the API easier, we've built a **Streamlit** interface that allows you to input transaction data and receive fraud predictions visually.
 
-We welcome contributions! Feel free to open an issue or submit a pull request if you would like to improve the project.
+### 1. **Run Streamlit**
 
-### Steps to Contribute:
-1. Fork the repository.
-2. Create a new branch for your feature or bugfix.
-3. Submit a pull request for review.
+To start the Streamlit app, use the following command:
 
----
+```bash
+streamlit run streamlit_app/main_ui.py
+```
 
-## License
+This will start a local web server, and you can access the UI in your browser at:
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+```
+http://localhost:8501
+```
 
----
+### 2. **Streamlit Interface**
 
-## Contact
+Once the Streamlit interface is running, you can input transaction details such as:
 
-For any questions or issues, feel free to reach out to:
+- `Amount`
+- `Old Balance Original`
+- `New Balance Original`
+- `Old Balance Destination`
+- `New Balance Destination`
 
-- **Email**: muhibuddin14@gmail.com
-- **GitHub**: [muhibuddin12](https://github.com/muhibuddin12)
+After submitting the data, you will receive a prediction indicating whether the transaction is likely to be fraudulent, along with the fraud probability.
 
----
+## 📂 Project Structure
 
-### Conclusion
-This Fraud Detection API provides a flexible, machine learning-based solution to detect fraudulent transactions. With its easy-to-integrate API, it's suitable for various applications requiring fraud detection services.
+```plaintext
+FraudDetection/
+│
+├── app/
+│   ├── main.py             # FastAPI entry point
+│   ├── models/             # Trained machine learning models
+│   └── services/           # Service logic for predictions
+│
+├── streamlit_app/
+│   ├── main_ui.py          # Streamlit interface
+│   ├── schemas/            # Request and response schemas
+│   └── services/           # API interaction logic
+│
+├── .gitignore              # Ignore unnecessary files like .env and venv/
+├── requirements.txt        # Project dependencies
+├── README.md               # Project overview and setup instructions
+└── .env                    # Environment configuration (not included in the repo)
+```
 
----
+## 💡 Contribution
 
-Dengan contoh README ini, pengguna lain bisa dengan mudah memahami tujuan proyek, cara menginstal, dan cara menjalankan API untuk deteksi fraud. Kamu bisa menyesuaikan informasi detailnya sesuai dengan kebutuhan proyekmu.
+Contributions are welcome! Please feel free to submit a pull request or create issues for any bugs or improvements.
