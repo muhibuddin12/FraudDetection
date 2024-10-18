@@ -1,7 +1,3 @@
-Berikut adalah contoh **README** yang menarik untuk GitHub, yang menjelaskan tujuan proyek, cara instalasi, dan cara menjalankannya. Kamu bisa menyesuaikan dengan proyek deteksi fraud yang sedang kamu buat.
-
----
-
 # Fraud Detection API
 
 ### Overview
