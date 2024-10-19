@@ -1,6 +1,6 @@
 import joblib
 import numpy as np
-from schemas.prediction import PredictionRequest, PredictionResponse
+from app.schemas.prediction import PredictionRequest, PredictionResponse
 
 class ModelService:
     def __init__(self, model_path: str):
