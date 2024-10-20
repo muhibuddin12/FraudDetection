@@ -1,46 +1,93 @@
+from io import BytesIO
 import streamlit as st
-from schemas.ui_input import FraudInput
+from models.fraud_input import FraudInput
 from services.api_service import get_api_service
+import pandas as pd
+from services.api_service import ApiService
+from services.prediction_service import PredictionService
+from utils.file_handler import download_csv
+from services.openai_service import PandasAIChatBot
+from PIL import Image
 
-# Inisialisasi ApiService dengan Dependency Injection
-api_service = get_api_service()
 
-# Judul aplikasi
-st.title("Fraud Transaction Prediction")
+def main():
 
-# Form untuk input data transaksi
-with st.form("fraud_prediction_form"):
-    amount = st.number_input("Amount", min_value=0.0, value=1000.0, step=100.0)
-    oldbalanceOrg = st.number_input("Old Balance Original", min_value=0.0, value=5000.0, step=100.0)
-    newbalanceOrig = st.number_input("New Balance Original", min_value=0.0, value=4000.0, step=100.0)
-    oldbalanceDest = st.number_input("Old Balance Destination", min_value=0.0, value=10000.0, step=100.0)
-    newbalanceDest = st.number_input("New Balance Destination", min_value=0.0, value=11000.0, step=100.0)
+    # Inisialisasi ApiService dengan Dependency Injection
+    api_service = get_api_service()
+    prediction_service = PredictionService(api_service)
+    llm = PandasAIChatBot()
 
-    # Tombol submit untuk prediksi
-    submitted = st.form_submit_button("Predict Fraud")
 
-# Proses prediksi ketika tombol submit ditekan
-if submitted:
-    # Membuat objek FraudInput untuk validasi input
-    input_data = FraudInput(
-        amount=amount,
-        oldbalanceOrg=oldbalanceOrg,
-        newbalanceOrig=newbalanceOrig,
-        oldbalanceDest=oldbalanceDest,
-        newbalanceDest=newbalanceDest
-    )
+    # Placeholder for the file and prediction
+    if 'predictions' not in st.session_state:
+        st.session_state['predictions'] = None
+
+
+    # Judul aplikasi
+    st.title("Fraud Transaction Prediction")
+    algorithm = st.selectbox("Pilih Fraud Detection Model", ("Random Forest","Logistic Regresion","DecisionTreeClassifier"))
+    # Upload file CSV
+    uploaded_file = st.file_uploader("Upload a CSV file for prediction", type=["csv"])
+    if uploaded_file is not None:
+        # Baca file CSV yang diunggah
+        data = pd.read_csv(uploaded_file)
+        st.write("Uploaded Data:", data.head())
+
+        # Tombol untuk melakukan prediksi
+        if st.button("Predict"):
+            # Lakukan prediksi berdasarkan algoritma yang dipilih
+            predictions = prediction_service.predict(algorithm, uploaded_file)
+            if predictions:
+                 # Store predictions in session state
+                st.session_state['predictions'] = predictions
+                # Tampilkan hasil CSV yang dikembalikan dari API
+                st.success("Prediction complete! Download the result below.")
+
+        # Show the download button only if predictions are available
+        if st.session_state['predictions'] is not None:
+            # Tombol untuk mengunduh file CSV hasil prediksi dengan key unik
+            st.download_button(
+                label="Download CSV", 
+                data=st.session_state['predictions'], 
+                file_name="predictions.csv", 
+                mime="text/csv",
+                key="download_csv_button"  # Adding a unique key to avoid duplicate ID errors
+            )
+            data =  pd.read_csv(BytesIO(st.session_state['predictions']))
+
+            st.dataframe(data)
+
+            # Show a spinner while waiting for the API response
+            with st.spinner('Analyzing data with LLM, please wait...'):
+                response = llm.chat_with_dataframe_to_analyse(data, "Analisa data tersebut dan berikan insight dari data tersebut.")
+            
+            st.write(response)
+
+            prompt_input = st.text_input(label="Prompt")
+            button_chat = st.button("Kirim")
+            if button_chat:
+
+                with st.spinner('Please wait...'):
+                    response = llm.chat_with_dataframe(data,prompt_input)
+
+                # Check if `response` is a DataFrame
+                if isinstance(response, pd.DataFrame):
+                    # If response is a DataFrame, display it in Streamlit
+                    st.write(response)
+                elif isinstance(response, str) and response == "/home/muhibuddin/FraudDetection/streamlit_app/exports/charts/temp_chart.png":
+                    # If the response is an image file path, open and display the image
+                    try:
+                        img = Image.open(response)
+                        st.image(img, caption="Fraud Detection Chart", use_column_width=True)
+                    except Exception as e:
+                        st.error(f"Error opening image: {e}")
+                else:
+                    # Handle unexpected cases
+                    st.write(response)
+
+
     
-    # Mengirim data ke API dan menerima hasil prediksi
-    result = api_service.predict_fraud(input_data)
-    
-    # Tampilkan hasil prediksi
-    if "error" in result:
-        st.error(result["error"])
-    else:
-        is_fraud = result["is_fraud"]
-        probability = result["probability"]
-        
-        if is_fraud:
-            st.error(f"Fraud detected with probability {probability:.2f}")
-        else:
-            st.success(f"No fraud detected with probability {probability:.2f}")
+
+
+if __name__ == "__main__":
+    main()

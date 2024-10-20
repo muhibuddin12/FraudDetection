@@ -1,1 +1,1 @@
-API_MODEL = ""
+OPENAI_API_KEY = ""

@@ -28,6 +28,6 @@ class ModelService:
     
 # Dependency Injection untuk service
 def get_model_service():
-    model_path = 'models/random_forest_model.pkl'
+    model_path = 'app/models/random_forest_model.pkl'
     return ModelService(model_path)
 
